@@ -1,0 +1,64 @@
+structure                   1_input/polymer_drug_solvate.psf
+coordinates                 1_input/polymer_drug_solvate.pdb
+
+set temperature             310
+cosAngles                   on
+set outputname              run_pr
+
+firsttimestep               00000
+
+paraTypeCharmm              on
+
+parameters                  0_parameters/base.par
+parameters                  0_parameters/pbe_cg.par
+
+temperature                 $temperature
+
+exclude                     1-2
+1-4scaling                  1.0
+cutoff                      14.0
+martiniSwitching            on
+switching                   on
+
+PME                         no
+switchdist                  9.0
+pairlistdist                16.0
+dielectric                  15.0
+
+timestep                    20
+nonbondedFreq               1
+fullElectFrequency          2
+stepspercycle               10
+
+langevin                    on
+langevinDamping             1
+langevinTemp                $temperature
+langevinHydrogen            off
+
+cellBasisVector1            140.0   0.   0.0
+cellBasisVector2            0.0   140.0   0.0
+cellBasisVector3            0.0   0   140.0
+cellOrigin                  0.   0.   0.
+
+wrapAll                     on
+margin                      10
+
+useGroupPressure            yes
+
+langevinPiston              on
+langevinPistonTarget        1.01325
+langevinPistonPeriod        2000.0
+langevinPistonDecay         1000.0
+langevinPistonTemp          $temperature
+
+outputName                  $outputname
+
+restartfreq                 5000
+dcdfreq                     5000
+xstFreq                     5000
+outputEnergies              5000
+outputPressure              5000
+
+minimize                    5000
+
+run                         2500000
