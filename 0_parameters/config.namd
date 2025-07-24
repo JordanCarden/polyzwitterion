@@ -1,5 +1,5 @@
-structure                   1_input/polymer_drug_solvate.psf
-coordinates                 1_input/polymer_drug_solvate.pdb
+structure                   ../../../1_input/polymer_drug_solvate.psf
+coordinates                 ../../../1_input/polymer_drug_solvate.pdb
 
 set temperature             310
 cosAngles                   on
@@ -9,8 +9,8 @@ firsttimestep               00000
 
 paraTypeCharmm              on
 
-parameters                  0_parameters/base.par
-parameters                  0_parameters/pbe_cg.par
+parameters                  nbfix.par
+parameters                  bonded.par
 
 temperature                 $temperature
 
