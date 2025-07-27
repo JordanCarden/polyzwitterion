@@ -1,5 +1,5 @@
-structure                   /home/admin/Code/polyzwitterion/1_input/polymer_drug_solvate.psf
-coordinates                 /home/admin/Code/polyzwitterion/1_input/polymer_drug_solvate.pdb
+structure                   /work/jcarde7/polyzwitterion/1_input/polymer_drug_solvate.psf
+coordinates                 /work/jcarde7/polyzwitterion/1_input/polymer_drug_solvate.pdb
 
 set temperature             310
 cosAngles                   on
@@ -10,7 +10,7 @@ firsttimestep               00000
 paraTypeCharmm              on
 
 parameters                  nbfix.par
-parameters                  /home/admin/Code/polyzwitterion/0_parameters/bonded.par
+parameters                  /work/jcarde7/polyzwitterion/0_parameters/bonded.par
 
 temperature                 $temperature
 
@@ -61,4 +61,4 @@ outputPressure              5000
 
 minimize                    5000
 
-run                         25000
+run                         100000
