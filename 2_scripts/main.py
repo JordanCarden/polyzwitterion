@@ -250,7 +250,7 @@ def main() -> None:
     """Run CMA‑ES optimisation with early stop on valid Rg window."""
     es = cma.CMAEvolutionStrategy(
         INIT_EPS,
-        0.2,
+        0.8,
         {"popsize": POP, "bounds": [[LOW] * 10, [HIGH] * 10]},
     )
     csv_file = REPO / "optimisation_results.csv"
