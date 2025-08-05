@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH -J XPLODE_HPC
 #SBATCH -A loni_pdrug
-#SBATCH -p workq               # CPU partition
+#SBATCH -p workq
 #SBATCH -N 3
 #SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=16

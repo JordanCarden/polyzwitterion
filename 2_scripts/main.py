@@ -27,6 +27,11 @@ PAIRS = [
     ("N1", "Q1"),
     ("N1", "Q2"),
     ("Q1", "Q2"),
+    ("W", "TQ5"),
+    ("C1", "TQ5"),
+    ("N1", "TQ5"),
+    ("Q1", "TQ5"),
+    ("Q2", "TQ5"),
 ]
 
 REPO = Path(__file__).resolve().parent.parent
@@ -163,7 +168,7 @@ def write_slurm(gen: int) -> None:
         f"""#!/bin/bash
 #SBATCH -J XPLODE_HPC
 #SBATCH -A loni_pdrug
-#SBATCH -p workq               # CPU partition
+#SBATCH -p workq
 #SBATCH -N 3
 #SBATCH --ntasks-per-node=4
 #SBATCH --cpus-per-task=16
@@ -196,8 +201,8 @@ def submit_and_wait() -> None:
         time.sleep(300)
 
 
-def rg_last_20ns(child: Path) -> float:
-    """Compute mean Rg over the last 20 ns of trajectory.
+def avg_rg(child: Path) -> float:
+    """Compute mean Rg over the last 100 frames of trajectory.
 
     Args:
         child: Directory containing `run_pr.dcd`.
@@ -205,12 +210,12 @@ def rg_last_20ns(child: Path) -> float:
     Returns:
         Average radius of gyration in Å.
     """
-    psf = REPO / "1_input" / "polymer_drug_solvate.psf"
+    psf = REPO / "1_input" / "polymer_drug_solvate_ion.psf"
     dcd = child / "run_pr.dcd"
     u = mda.Universe(psf, dcd)
-    sel = u.select_atoms("not (name W HOH)")
+    sel = u.select_atoms("not (name W HOH Q1A Q2A)")
     values = []
-    for _ in u.trajectory[-200:]:
+    for _ in u.trajectory[-100:]:
         com = sel.center_of_mass()
         diff = sel.positions - com
         sq = np.sum(diff**2, axis=1)
@@ -273,7 +278,7 @@ def main() -> None:
         hit = False
         for idx in range(1, POP + 1):
             child = gdir / f"child_{idx:02d}"
-            rg = rg_last_20ns(child)
+            rg = avg_rg(child)
             err = abs(rg - TARGET_RG)
             fitness.append(err)
             log_csv(csv_file, gen, idx, vecs[idx - 1], rg, err)
