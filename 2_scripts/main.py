@@ -16,24 +16,6 @@ POP = 12
 TARGET_RG = 36.0
 GEN_MAX = 30
 
-PAIRS = [
-    ("W", "N1"),
-    ("W", "C1"),
-    ("W", "Q1"),
-    ("W", "Q2"),
-    ("C1", "N1"),
-    ("C1", "Q1"),
-    ("C1", "Q2"),
-    ("N1", "Q1"),
-    ("N1", "Q2"),
-    ("Q1", "Q2"),
-    ("W", "TQ5"),
-    ("C1", "TQ5"),
-    ("N1", "TQ5"),
-    ("Q1", "TQ5"),
-    ("Q2", "TQ5"),
-]
-
 REPO = Path(__file__).resolve().parent.parent
 NAMD = BASE / "NAMD_2.14_Linux-x86_64-multicore/namd2"
 
@@ -84,6 +66,32 @@ def in_target_window(rg: float) -> bool:
     return LOWER_RG <= rg <= UPPER_RG
 
 
+def load_pairs(nbfix: Path) -> list[tuple[str, str]]:
+    """Return nonidentical atom-type pairs from the NBFIX section.
+
+    Args:
+        nbfix: Path to ``nbfix.par``.
+
+    Returns:
+        Pairs ``(a, b)`` where ``a != b`` in file order.
+    """
+    pairs: list[tuple[str, str]] = []
+    in_section = False
+    for line in nbfix.read_text().splitlines():
+        parts = line.split()
+        if not parts:
+            continue
+        if not in_section:
+            if parts[0] == "NBFIX":
+                in_section = True
+            continue
+        if len(parts) >= 4:
+            a, b = parts[0], parts[1]
+            if a != b:
+                pairs.append((a, b))
+    return pairs
+
+
 def load_allowed() -> list[float]:
     """Load allowed epsilon values from file.
 
@@ -94,9 +102,11 @@ def load_allowed() -> list[float]:
     return sorted(abs(float(x)) for x in txt.read_text().split())
 
 
+PAIRS = load_pairs(REPO / "0_parameters" / "nbfix.par")
+N_PAIRS = len(PAIRS)
 ALLOWED = load_allowed()
 LOW, HIGH = ALLOWED[0], ALLOWED[-1]
-INIT_EPS = [np.median(ALLOWED)] * 10
+INIT_EPS = [np.median(ALLOWED)] * N_PAIRS
 
 
 def snap_to_allowed(vec: list[float]) -> list[float]:
@@ -146,8 +156,10 @@ def edit_nbfix(path: Path, eps: list[float]) -> None:
 
     Args:
         path: `nbfix.par` file to edit.
-        eps: Epsilon magnitudes for the ten pair types.
+        eps: Epsilon magnitudes for the pair types; length must equal ``len(PAIRS)``.
     """
+    if len(eps) != len(PAIRS):
+        raise ValueError("epsilon vector length mismatch")
     repl = {p: f"-{v:.8f}" for p, v in zip(PAIRS, eps)}
     out: List[str] = []
     for line in path.read_text().splitlines():
@@ -256,7 +268,7 @@ def main() -> None:
     es = cma.CMAEvolutionStrategy(
         INIT_EPS,
         0.8,
-        {"popsize": POP, "bounds": [[LOW] * 10, [HIGH] * 10]},
+        {"popsize": POP, "bounds": [[LOW] * N_PAIRS, [HIGH] * N_PAIRS]},
     )
     csv_file = REPO / "optimisation_results.csv"
     gen = 1
