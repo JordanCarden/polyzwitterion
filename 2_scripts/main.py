@@ -225,7 +225,7 @@ def avg_rg(child: Path) -> float:
     psf = REPO / "1_input" / "polymer_drug_solvate_ion.psf"
     dcd = child / "run_pr.dcd"
     u = mda.Universe(psf, dcd)
-    sel = u.select_atoms("not (name W HOH Q1A Q2A)")
+    sel = u.select_atoms("not (name W HOH Q1A Q2A TQ5)")
     values = []
     for _ in u.trajectory[-100:]:
         com = sel.center_of_mass()
