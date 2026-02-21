@@ -10,14 +10,14 @@
 ## ADJUSTABLE PARAMETERS                                   ##
 #############################################################
 
-structure          /work/jcarde7/polyzwitterion/1_input/polymer_drug_solvate_ion.psf
-coordinates        /work/jcarde7/polyzwitterion/1_input/polymer_drug_solvate_ion.pdb
+structure          system.psf
+coordinates        system.pdb
 
 set temperature    310
 cosAngles	   on
-set outputname     run_pr
+set outputname     state_continue
 
-firsttimestep      0
+firsttimestep      000000
 
 
 #############################################################
@@ -27,16 +27,16 @@ firsttimestep      0
 # Input
 paraTypeCharmm	    on
 
-parameters  nbfix.par
-parameters  /work/jcarde7/polyzwitterion/0_parameters/bonded.par   
-#parameters  martini-NB
+parameters  ff_nbfix_opt.par
+parameters  ff_pbe_cg.par   
+#parameters  martini-NB 
 
-temperature         $temperature  #comment when restarting a simulation
+#temperature         $temperature  #comment when restarting a simulation
 
 # restart 
-#bincoordinates run_pr.restart.coor
-#binvelocities  run_pr.restart.vel
-#extendedSystem run_pr.restart.xsc
+bincoordinates state_init.restart.coor
+binvelocities  state_init.restart.vel
+extendedSystem state_init.restart.xsc
 
 
 # Force-Field Parameters
@@ -53,7 +53,7 @@ pairlistdist        16.0
 dielectric	    15.0
 
 # Integrator Parameters
-timestep            20  ;# 
+timestep            20.0000001  ;# 
 #rigidBonds          all  ;# needed for 2fs steps
 nonbondedFreq       1
 fullElectFrequency  2  
@@ -67,10 +67,10 @@ langevinHydrogen    off    ;# don't couple langevin bath to hydrogens
 
 
 #Periodic Boundary Conditions 
-cellBasisVector1    140.0     0.    0.0
-cellBasisVector2      0.0  140.0    0.0
-cellBasisVector3      0.0     0   140.0
-cellOrigin            0.      0.    0.
+#cellBasisVector1    250.0     0.    0.0
+#cellBasisVector2      0.0  250.0    0.0
+#cellBasisVector3      0.0     0   250.0
+#cellOrigin            0.      0.    0.
 
 wrapAll             on
 margin 10
@@ -118,6 +118,6 @@ outputPressure      5000
 #############################################################
 
 # Minimization
-minimize            50000
+minimize            5000
 
-run	     1000000
+run	     1500000
